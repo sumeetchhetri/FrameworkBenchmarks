@@ -201,6 +201,17 @@ def main(argv=None):
         '--network-mode',
         default=None,
         help='The network mode to run docker in')
+		
+    parser.add_argument(
+        '--local-dev-mode',
+        action='store_true',
+        default=False,
+        help='server and database both run locally, very easy during development, building containers takes huge aount of time every single time if there are changes in framework source code')
+    parser.add_argument(
+        '--enable-core-dumps',
+        action='store_true',
+        default=False,
+        help='sometimes we may need core dumps from the conatiner')
 
     args = parser.parse_args()
 

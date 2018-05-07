@@ -7,6 +7,14 @@ for (var i = 1; i <= 10000; i++) {
 db.world.createIndex({_id: 1})
 db.world.createIndex({id: 1})
 
+db.cachedworld.drop()
+for (var i = 1; i <= 10000; i++) {
+  db.cachedworld.save( { _id: i, id: i, randomNumber: (Math.floor(Math.random() * 10000) + 1) })
+}
+
+db.cachedworld.createIndex({_id: 1})
+db.cachedworld.createIndex({id: 1})
+
 db.fortune.drop()
 
 db.fortune.save( {_id: 1, id: 1, message: 'fortune: No such file or directory'} );

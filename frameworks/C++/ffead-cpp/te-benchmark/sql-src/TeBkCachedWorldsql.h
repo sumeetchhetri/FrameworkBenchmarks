@@ -1,29 +1,29 @@
 /*
- * TeBkWorld.h
+ * TeBkCachedWorld.h
  *
  *  Created on: 11-Mar-2015
  *      Author: sumeetc
  */
 
-#ifndef TEBKWORLD_H_
-#define TEBKWORLD_H_
+#ifndef TeBkCachedWorld_H_
+#define TeBkCachedWorld_H_
 #include "string"
 
 
 #pragma @Entity
-#pragma @Table name="world"
-class TeBkWorld {
+#pragma @Table name="cachedworld"
+class TeBkCachedWorld {
 	#pragma @Id dbf="id"
 	int id;
 	#pragma @Column dbf="randomNumber"
 	int randomNumber;
 public:
-	TeBkWorld();
-	virtual ~TeBkWorld();
+	TeBkCachedWorld();
+	virtual ~TeBkCachedWorld();
 	int getId() const;
 	void setId(int id);
 	int getRandomNumber() const;
 	void setRandomNumber(int randomNumber);
 };
 
-#endif /* TEBKWORLD_H_ */
+#endif /* TeBkCachedWorld_H_ */

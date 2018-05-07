@@ -21,9 +21,15 @@ make
 make install
 cd ${IROOT}
 
+sed -i 's|#define PACKAGE_BUGREPORT "sumeet.chhetri@gmail.com"| |g' ${IROOT}/ffead-cpp-2.0/include/AppDefines.h
+sed -i 's|#define PACKAGE_NAME "ffead-cpp"| |g' ${IROOT}/ffead-cpp-2.0/include/AppDefines.h
+sed -i 's|#define PACKAGE_STRING "ffead-cpp 2.0"| |g' ${IROOT}/ffead-cpp-2.0/include/AppDefines.h
+sed -i 's|#define PACKAGE_TARNAME "ffead-cpp"| |g' ${IROOT}/ffead-cpp-2.0/include/AppDefines.h
+sed -i 's|#define PACKAGE_VERSION "2.0"| |g' ${IROOT}/ffead-cpp-2.0/include/AppDefines.h
+
 cd ${IROOT}/ffead-cpp-src/modules/apache_mod_ffeadcpp/
-g++ -fpic -DSHARED_MODULE -fpermissive -I"${IROOT}/httpd/include" -I"${IROOT}/ffead-cpp-2.0/include/" -I"${IROOT}/include" -I"${IROOT}/include/libbson-1.0/" -I"${IROOT}/include/libmongoc-1.0" mod_ffeadcpp.cpp -L"${IROOT}/ffead-cpp-2.0/lib" -L"${IROOT}" -lffead_common -lffead_framework -ldl -lcrypto -lssl -c mod_ffeadcpp.cpp
-g++ -shared -o mod_ffeadcpp.so mod_ffeadcpp.o -L"${IROOT}/ffead-cpp-2.0/lib" -L"${IROOT}" -L"${IROOT}/httpd/lib" -lffead_common -lffead_framework -ldl -lcrypto -lssl -lapr-1 -laprutil-1 -lstdc++
+g++ -fpic -DSHARED_MODULE -fpermissive -std=gnu++11 -I"${IROOT}/httpd/include" -I"${IROOT}/ffead-cpp-2.0/include/" -I"${IROOT}/include" -I"${IROOT}/include/libbson-1.0/" -I"${IROOT}/include/libmongoc-1.0" mod_ffeadcpp.cpp -L"${IROOT}/ffead-cpp-2.0/lib" -L"${IROOT}" -L"${IROOT}/lib" -lffead_common -lffead_framework -ldl -lcrypto -lssl ${ADD_EXTRA_LIB} -c mod_ffeadcpp.cpp
+g++ -shared -o mod_ffeadcpp.so mod_ffeadcpp.o -L"${IROOT}/ffead-cpp-2.0/lib" -L"${IROOT}" -L"${IROOT}/lib" -L"${IROOT}/httpd/lib" -lffead_common -lffead_framework -ldl -lcrypto -lssl -lapr-1 -laprutil-1 -lstdc++ ${ADD_EXTRA_LIB}
 ${IROOT}/httpd/bin/apxs -i -n 'ffead_cpp' mod_ffeadcpp.so
 cd -
 
@@ -53,7 +59,7 @@ else
 	sed -i '/^export ODBCSYSINI/ d' ${IROOT}/httpd/bin/envvars	
 bash -c 'cat <<EOL >> ${IROOT}/httpd/bin/envvars
 export FFEAD_CPP_PATH='"${FFEADROOT}"'
-export LD_LIBRARY_PATH='"${FFEADROOT}"'/lib:'"${IROOT}"':$LD_LIBRARY_PATH/
+export LD_LIBRARY_PATH='"${FFEADROOT}"'/lib:'"${IROOT}"':'"${IROOT}"'/lib:$LD_LIBRARY_PATH/
 export ODBCINI='"$IROOT"'/odbc.ini
 export ODBCSYSINI='"$IROOT"' 
 EOL'

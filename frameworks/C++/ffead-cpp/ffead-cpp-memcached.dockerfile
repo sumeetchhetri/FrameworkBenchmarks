@@ -7,12 +7,11 @@ ENV FFEAD_TEST_TYPE=mongo
 ENV FFEAD_TEST_DB_NAME=mongo
 ENV FFEAD_ENABLE_SDORM_SQL="no"
 ENV FFEAD_ENABLE_SDORM_MONGO="yes"
-ENV FFEAD_ENABLE_APACHEMOD="yes"
+ENV FFEAD_ENABLE_APACHEMOD="no"
 ENV FFEAD_ENABLE_NGINXMOD="no"
 ENV FFEAD_ENABLE_REDIS="no"
-ENV FFEAD_ENABLE_MEMCACHED="no"
+ENV FFEAD_ENABLE_MEMCACHED="yes"
 ENV FFEAD_ENABLE_DEBUG="no"
-ENV ADD_EXTRA_LIB=""
 
 RUN mkdir /installs
 
@@ -26,12 +25,14 @@ RUN ./ffead-cpp-dependencies.sh
 
 WORKDIR /
 
-RUN ./ffead-cpp-framework.sh
+RUN ./ffead-cpp-memcached.sh
 
 WORKDIR /
 
-RUN ./ffead-cpp-httpd.sh
+RUN ./ffead-cpp-framework.sh
 
-ENV PATH=${IROOT}/httpd/bin:${PATH}
+RUN cp -f ${IROOT}/ffead-cpp-2.0/web/te-benchmark/config/cachememcached.xml ${IROOT}/ffead-cpp-2.0/web/te-benchmark/config/cache.xml
 
-CMD apachectl -D FOREGROUND
+WORKDIR ${IROOT}/ffead-cpp-2.0
+
+CMD ./server.sh

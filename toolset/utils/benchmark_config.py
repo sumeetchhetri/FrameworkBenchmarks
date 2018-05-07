@@ -31,8 +31,12 @@ class BenchmarkConfig:
         self.exclude = args.exclude
         self.build = args.build
         self.quiet = args.quiet
-        self.server_host = args.server_host
-        self.database_host = args.database_host
+        if args.local_dev_mode:
+            self.server_host = '172.16.0.16'
+            self.database_host = '172.16.0.16'
+        else:
+            self.server_host = args.server_host
+            self.database_host = args.database_host
         self.client_host = args.client_host
         self.new = args.new
         self.clean = args.clean
@@ -55,6 +59,8 @@ class BenchmarkConfig:
         self.database_docker_host = None
         self.client_docker_host = None
         self.network = None
+        self.local_dev_mode = args.local_dev_mode
+        self.enable_core_dumps = args.enable_core_dumps
 
         if self.network_mode is None:
             self.network = 'tfb'

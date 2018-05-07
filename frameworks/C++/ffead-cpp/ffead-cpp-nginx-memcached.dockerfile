@@ -10,9 +10,9 @@ ENV FFEAD_ENABLE_SDORM_MONGO="yes"
 ENV FFEAD_ENABLE_APACHEMOD="no"
 ENV FFEAD_ENABLE_NGINXMOD="yes"
 ENV FFEAD_ENABLE_REDIS="no"
-ENV FFEAD_ENABLE_MEMCACHED="no"
+ENV FFEAD_ENABLE_MEMCACHED="yes"
 ENV FFEAD_ENABLE_DEBUG="no"
-ENV ADD_EXTRA_LIB=""
+ENV ADD_EXTRA_LIB="-lmemcachedutil"
 
 RUN mkdir /installs
 
@@ -26,14 +26,20 @@ RUN ./ffead-cpp-dependencies.sh
 
 WORKDIR /
 
+RUN ./ffead-cpp-memcached.sh
+
+WORKDIR /
+
 RUN ./ffead-cpp-framework.sh
 
 WORKDIR /
 
 RUN ./ffead-cpp-nginx.sh
 
+RUN cp -f ${IROOT}/ffead-cpp-2.0/web/te-benchmark/config/cachememcached.xml ${IROOT}/ffead-cpp-2.0/web/te-benchmark/config/cache.xml
+
 ENV PATH=${IROOT}/nginxfc/sbin:${PATH}
-ENV LD_LIBRARY_PATH=${IROOT}/:${FFEAD_CPP_PATH}/lib:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=${IROOT}/:${IROOT}/lib:${FFEAD_CPP_PATH}/lib:$LD_LIBRARY_PATH
 ENV ODBCINI=${IROOT}/odbc.ini
 ENV ODBCSYSINI=${IROOT}
 

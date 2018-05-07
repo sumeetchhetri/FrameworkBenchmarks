@@ -1,3 +1,5 @@
+\c hello_world
+
 BEGIN;
 
 CREATE TABLE  World (
@@ -8,6 +10,16 @@ CREATE TABLE  World (
 GRANT SELECT, UPDATE ON World to benchmarkdbuser;
 
 INSERT INTO World (id, randomnumber)
+SELECT x.id, floor(random() * 10000 + 1) FROM generate_series(1,10000) as x(id);
+
+CREATE TABLE  CachedWorld (
+  id integer NOT NULL,
+  randomNumber integer NOT NULL default 0,
+  PRIMARY KEY  (id)
+);
+GRANT SELECT, UPDATE ON CachedWorld to benchmarkdbuser;
+
+INSERT INTO CachedWorld (id, randomnumber)
 SELECT x.id, floor(random() * 10000 + 1) FROM generate_series(1,10000) as x(id);
 
 CREATE TABLE Fortune (
@@ -38,6 +50,16 @@ CREATE TABLE  "World" (
 GRANT SELECT, UPDATE ON "World" to benchmarkdbuser;
 
 INSERT INTO "World" (id, randomnumber)
+SELECT x.id, floor(random() * 10000 + 1) FROM generate_series(1,10000) as x(id);
+
+CREATE TABLE  "CachedWorld" (
+  id integer NOT NULL,
+  randomNumber integer NOT NULL default 0,
+  PRIMARY KEY  (id)
+);
+GRANT SELECT, UPDATE ON "CachedWorld" to benchmarkdbuser;
+
+INSERT INTO "CachedWorld" (id, randomnumber)
 SELECT x.id, floor(random() * 10000 + 1) FROM generate_series(1,10000) as x(id);
 
 CREATE TABLE "Fortune" (

@@ -150,6 +150,13 @@ def run(benchmarker_config, test, run_log_dir):
             'soft': 99
         }]
 
+        if benchmarker_config.enable_core_dumps:
+            ulimit.append({
+                'name': 'core',
+                'hard': 900000000000,
+                'soft': 900000000000
+            })
+
         container = client.containers.run(
             "techempower/tfb.test.%s" % test.name,
             name=name,
@@ -302,15 +309,38 @@ def test_client_connection(benchmarker_config, url):
     Tests that the app server at the given url responds successfully to a 
     request.
     '''
+
+    wrk_dir = os.path.join(benchmarker_config.fwroot, "toolset", "wrk")
+    docker_file = "wrk.dockerfile"
+    log_prefix = "techempower/tfb.wrk:latest: "
+
     client = docker.DockerClient(
         base_url=benchmarker_config.client_docker_host)
 
     try:
         client.images.get('techempower/tfb.wrk:latest')
     except:
-        log("Attempting docker pull for image (this can take some time)",
-            prefix="techempower/tfb.wrk:latest: ")
-        client.images.pull('techempower/tfb.wrk:latest')
+        try:
+            log("Attempting docker pull for image (this can take some time)",
+                prefix="techempower/tfb.wrk:latest: ")
+            client.images.pull('techempower/tfb.wrk:latest')
+        except:
+            # Build the database image
+            for line in docker.APIClient(
+                 base_url=benchmarker_config.client_docker_host).build(
+                    path=wrk_dir,
+                    dockerfile=docker_file,
+                    tag="techempower/tfb.wrk"):
+                 if line.startswith('{"stream":'):
+                     line = json.loads(line)
+                     line = line[line.keys()[0]].encode('utf-8')
+                     log(line,
+                         prefix=log_prefix,
+                         color=Fore.WHITE + Style.BRIGHT \
+                             if re.match(r'^Step \d+\/\d+', line) else '')
+
+    client = docker.DockerClient(
+        base_url=benchmarker_config.client_docker_host)
 
     try:
         client.containers.run(

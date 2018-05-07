@@ -35,6 +35,35 @@ DELIMITER ;
 
 CALL load_data();
 
+CREATE TABLE  cachedworld (
+  id int(10) unsigned NOT NULL auto_increment,
+  randomNumber int NOT NULL default 0,
+  PRIMARY KEY  (id)
+)
+ENGINE=INNODB;
+GRANT SELECT, UPDATE ON hello_world.cachedworld TO 'benchmarkdbuser'@'%' IDENTIFIED BY 'benchmarkdbpass';
+GRANT SELECT, UPDATE ON hello_world.cachedworld TO 'benchmarkdbuser'@'localhost' IDENTIFIED BY 'benchmarkdbpass';
+
+DELIMITER #
+CREATE PROCEDURE load_data_cachedworld()
+BEGIN
+
+declare v_max int unsigned default 10000;
+declare v_counter int unsigned default 0;
+
+  TRUNCATE TABLE cachedworld;
+  START TRANSACTION;
+  while v_counter < v_max do
+    INSERT INTO cachedworld (randomNumber) VALUES ( floor(0 + (rand() * 10000)) );
+    SET v_counter=v_counter+1;
+  end while;
+  commit;
+END #
+
+DELIMITER ;
+
+CALL load_data_cachedworld();
+
 CREATE TABLE  fortune (
   id int(10) unsigned NOT NULL auto_increment,
   message varchar(2048) CHARACTER SET 'utf8' NOT NULL,

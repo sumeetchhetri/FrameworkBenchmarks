@@ -2,7 +2,11 @@
 
 cd $FFEAD_CPP_PATH
 
-export MALLOC_CHECK_=0
+#use below settings only for debugging
+#echo '/tmp/core.%h.%e.%t' > /proc/sys/kernel/core_pattern
+#ulimit -c unlimited
+
+#export MALLOC_CHECK_=0
 
 echo $FFEAD_CPP_PATH
 export LD_LIBRARY_PATH=$FFEAD_CPP_PATH/lib:$LD_LIBRARY_PATH

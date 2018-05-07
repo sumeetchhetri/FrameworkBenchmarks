@@ -13,7 +13,8 @@ libte_benchmark_la_SOURCES = ../TeBkFortune.cpp \
 				../TeBkFortuneTemplate.cpp \
 				../TeBkMessage.cpp \
 				../TeBkRestController.cpp \
-				../TeBkWorld.cpp
+				../TeBkWorld.cpp \
+				../TeBkCachedWorld.cpp
 
 libte_benchmark_la_LDFLAGS = -no-undefined 
 libte_benchmark_la_LIBADD = -L"${fprefix}/lib" -lffead_common -lffead_framework

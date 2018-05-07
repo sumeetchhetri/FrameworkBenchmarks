@@ -113,25 +113,13 @@ class Benchmarker:
 
         database_container = None
         try:
-            if self.__is_port_bound(test.port):
-                time.sleep(60)
+            if self.config.local_dev_mode is not True:
+                if self.__is_port_bound(test.port):
+                    time.sleep(60)
 
-            if self.__is_port_bound(test.port):
-                # We gave it our all
-                message = "Error: Port %s is not available, cannot start %s" % (test.port, test.name)
-                self.results.write_intermediate(test.name, message)
-                log(message,
-                    prefix=log_prefix,
-                    file=benchmark_log,
-                    color=Fore.RED)
-                return False
-
-            # Start database container
-            if test.database.lower() != "none":
-                database_container = docker_helper.start_database(
-                    self.config, test, test.database.lower())
-                if database_container is None:
-                    message = "ERROR: Problem building/running database container"
+                if self.__is_port_bound(test.port):
+                    # We gave it our all
+                    message = "Error: Port %s is not available, cannot start %s" % (test.port, test.name)
                     self.results.write_intermediate(test.name, message)
                     log(message,
                         prefix=log_prefix,
@@ -139,18 +127,32 @@ class Benchmarker:
                         color=Fore.RED)
                     return False
 
-            # Start webapp
-            container = test.start()
-            if container is None:
-                docker_helper.stop(self.config, container, database_container,
-                                   test)
-                message = "ERROR: Problem starting {name}".format(name=test.name)
-                self.results.write_intermediate(test.name, message)
-                log(message,
-                    prefix=log_prefix,
-                    file=benchmark_log,
-                    color=Fore.RED)
-                return False
+            if self.config.local_dev_mode is not True:
+                # Start database container
+                if test.database.lower() != "none":
+                    database_container = docker_helper.start_database(
+                        self.config, test, test.database.lower())
+                    if database_container is None:
+                        message = "ERROR: Problem building/running database container"
+                        self.results.write_intermediate(test.name, message)
+                        log(message,
+                            prefix=log_prefix,
+                            file=benchmark_log,
+                            color=Fore.RED)
+                        return False
+
+                # Start webapp
+                container = test.start()
+                if container is None:
+                    docker_helper.stop(self.config, container, database_container,
+                                       test)
+                    message = "ERROR: Problem starting {name}".format(name=test.name)
+                    self.results.write_intermediate(test.name, message)
+                    log(message,
+                        prefix=log_prefix,
+                        file=benchmark_log,
+                        color=Fore.RED)
+                    return False
 
             slept = 0
             max_sleep = 60
@@ -161,9 +163,10 @@ class Benchmarker:
                 slept += 1
 
             if not accepting_requests:
-                docker_helper.stop(self.config, container, database_container,
-                                   test)
-                message = "ERROR: Framework is not accepting requests from client machine"
+                if self.config.local_dev_mode is not True:
+                    docker_helper.stop(self.config, container, database_container,
+                                       test)
+                    message = "ERROR: Framework is not accepting requests from client machine"
                 self.results.write_intermediate(test.name, message)
                 log(message,
                     prefix=log_prefix,
@@ -191,9 +194,10 @@ class Benchmarker:
                     border='-')
                 self.__benchmark(test, benchmark_log)
 
-            # Stop this test
-            docker_helper.stop(self.config, container, database_container,
-                               test)
+            if self.config.local_dev_mode is not True:
+                # Stop this test
+                docker_helper.stop(self.config, container, database_container,
+                                   test)
 
             # Save results thus far into the latest results directory
             self.results.write_intermediate(test.name,
